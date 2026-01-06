@@ -5,24 +5,24 @@ import io
 
 # --- 页面配置 ---
 st.set_page_config(
-    page_title="AO Tech Tennis Analysis", 
+    page_title="Wimbledon Classic Tennis Analysis", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
 
-# --- 🎨 CSS 注入区：澳网科技风 (Australian Open Tech Style) ---
-ao_tech_style = """
+# --- 🎨 CSS 注入区：温网经典风 (Wimbledon Classic Style) ---
+wimbledon_style = """
 <style>
-    /* 1. 全局背景：深邃的澳网蓝渐变 */
+    /* 1. 全局背景：温网经典绿紫渐变 */
     .stApp {
-        background: linear-gradient(135deg, #021B35 0%, #003366 100%);
-        color: #FFFFFF;
+        background: linear-gradient(135deg, #005E2F 0%, #2C003E 100%);
+        color: #F0F0F0; /* 浅奶油色文字 */
     }
 
     /* 2. 侧边栏样式 */
     section[data-testid="stSidebar"] {
-        background-color: #011224;
-        border-right: 1px solid #1E3A5F;
+        background-color: #004a25; /* 深绿色 */
+        border-right: 1px solid #6C008F; /* 紫色边框 */
     }
     
     /* 侧边栏文字颜色 */
@@ -30,44 +30,46 @@ ao_tech_style = """
         color: #E0E0E0 !important;
     }
 
-    /* 3. 标题样式：荧光渐变文字 */
+    /* 3. 标题样式：金色与紫色典雅渐变 */
     h1, h2, h3 {
-        background: -webkit-linear-gradient(45deg, #00E5FF, #CCFF00);
+        background: -webkit-linear-gradient(45deg, #D4AF37, #A855F7); /* 金色到浅紫 */
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        font-family: 'Georgia', serif !important; /* 改用衬线体增加典雅感 */
         font-weight: 800 !important;
         letter-spacing: 1px;
     }
     
     /* 普通文本颜色 */
     p, label {
-        color: #E6F3FF !important;
+        color: #F0F0F0 !important;
         font-family: 'Helvetica Neue', sans-serif;
     }
 
-    /* 4. 按钮样式：科技感圆角按钮 */
+    /* 4. 按钮样式：经典紫金配色 */
     div.stButton > button {
-        background: linear-gradient(90deg, #00C6FF 0%, #0072FF 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
+        background: linear-gradient(90deg, #6C008F 0%, #8E24AA 100%); /* 紫色渐变 */
+        color: #D4AF37; /* 金色文字 */
+        border: 1px solid #D4AF37;
+        border-radius: 8px;
         padding: 0.6rem 1.2rem;
         font-weight: bold;
-        box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+        box-shadow: 0 4px 10px rgba(108, 0, 143, 0.3);
         transition: all 0.3s ease;
         width: 100%;
     }
     
     div.stButton > button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 114, 255, 0.5);
-        background: linear-gradient(90deg, #0072FF 0%, #00C6FF 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(108, 0, 143, 0.5);
+        background: linear-gradient(90deg, #8E24AA 0%, #6C008F 100%);
+        color: white;
     }
 
-    /* 5. 数据指标卡片 (Metric)：毛玻璃效果 */
+    /* 5. 数据指标卡片 (Metric)：典雅风格 */
     div[data-testid="stMetric"] {
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3); /* 金色边框 */
         padding: 15px;
         border-radius: 10px;
         backdrop-filter: blur(10px);
@@ -75,27 +77,40 @@ ao_tech_style = """
     }
     
     div[data-testid="stMetricLabel"] {
-        color: #00E5FF !important; /* 标签颜色 */
+        color: #D4AF37 !important; /* 金色标签 */
     }
     
     div[data-testid="stMetricValue"] {
-        color: #CCFF00 !important; /* 数值颜色：网球黄 */
+        color: #FFFFFF !important; /* 白色数值 */
         font-size: 2rem !important;
+        font-family: 'Georgia', serif;
     }
 
-    /* 6. 输入框和选择框样式 */
+    /* 6. 输入框和选择框样式 - 重点修改：白底黑字确保清晰 */
     .stTextInput>div>div>input, .stSelectbox>div>div>div, .stNumberInput>div>div>input {
-        background-color: rgba(255, 255, 255, 0.05);
-        color: white;
-        border-radius: 8px;
-        border: 1px solid #1E3A5F;
+        background-color: #FFFFFF !important; /* 白色背景 */
+        color: #333333 !important; /* 深灰色文字，高对比度 */
+        border-radius: 6px;
+        border: 2px solid #6C008F; /* 紫色边框 */
+        font-weight: 500;
     }
     
+    /* 修复 selectbox 选择后的文字颜色 */
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+        color: #333333 !important;
+    }
+
+
     /* 7. 表格样式 */
     div[data-testid="stDataFrame"] {
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(255, 255, 255, 0.9); /* 接近不透明的白色背景 */
         border-radius: 10px;
         padding: 10px;
+        color: #333333; /* 表格内文字变深 */
+    }
+    /* 强制表格内文字颜色 */
+    div[data-testid="stDataFrame"] div[data-testid="stTable"] {
+        color: #333333 !important;
     }
     
     /* 隐藏右上角菜单 */
@@ -104,10 +119,10 @@ ao_tech_style = """
 
 </style>
 """
-st.markdown(ao_tech_style, unsafe_allow_html=True)
+st.markdown(wimbledon_style, unsafe_allow_html=True)
 
 # --- 标题 ---
-st.title("🎾 AO Tech · 网球底线分析系统")
+st.title("🎾 Wimbledon Classic · 网球底线分析系统")
 
 # --- 侧边栏：功能导航 ---
 st.sidebar.title("🚀 功能导航")
