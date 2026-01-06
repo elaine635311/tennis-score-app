@@ -4,11 +4,113 @@ import numpy as np
 import io
 
 # --- 页面配置 ---
-st.set_page_config(page_title="网球底线测试综合系统", layout="wide", initial_sidebar_state="expanded")
-st.title("🎾 网球底线击球技能测试综合系统")
+st.set_page_config(
+    page_title="AO Tech Tennis Analysis", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
+
+# --- 🎨 CSS 注入区：澳网科技风 (Australian Open Tech Style) ---
+ao_tech_style = """
+<style>
+    /* 1. 全局背景：深邃的澳网蓝渐变 */
+    .stApp {
+        background: linear-gradient(135deg, #021B35 0%, #003366 100%);
+        color: #FFFFFF;
+    }
+
+    /* 2. 侧边栏样式 */
+    section[data-testid="stSidebar"] {
+        background-color: #011224;
+        border-right: 1px solid #1E3A5F;
+    }
+    
+    /* 侧边栏文字颜色 */
+    section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span {
+        color: #E0E0E0 !important;
+    }
+
+    /* 3. 标题样式：荧光渐变文字 */
+    h1, h2, h3 {
+        background: -webkit-linear-gradient(45deg, #00E5FF, #CCFF00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800 !important;
+        letter-spacing: 1px;
+    }
+    
+    /* 普通文本颜色 */
+    p, label {
+        color: #E6F3FF !important;
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    /* 4. 按钮样式：科技感圆角按钮 */
+    div.stButton > button {
+        background: linear-gradient(90deg, #00C6FF 0%, #0072FF 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    div.stButton > button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 114, 255, 0.5);
+        background: linear-gradient(90deg, #0072FF 0%, #00C6FF 100%);
+    }
+
+    /* 5. 数据指标卡片 (Metric)：毛玻璃效果 */
+    div[data-testid="stMetric"] {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        text-align: center;
+    }
+    
+    div[data-testid="stMetricLabel"] {
+        color: #00E5FF !important; /* 标签颜色 */
+    }
+    
+    div[data-testid="stMetricValue"] {
+        color: #CCFF00 !important; /* 数值颜色：网球黄 */
+        font-size: 2rem !important;
+    }
+
+    /* 6. 输入框和选择框样式 */
+    .stTextInput>div>div>input, .stSelectbox>div>div>div, .stNumberInput>div>div>input {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: white;
+        border-radius: 8px;
+        border: 1px solid #1E3A5F;
+    }
+    
+    /* 7. 表格样式 */
+    div[data-testid="stDataFrame"] {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 10px;
+    }
+    
+    /* 隐藏右上角菜单 */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+</style>
+"""
+st.markdown(ao_tech_style, unsafe_allow_html=True)
+
+# --- 标题 ---
+st.title("🎾 AO Tech · 网球底线分析系统")
 
 # --- 侧边栏：功能导航 ---
-st.sidebar.title("功能导航")
+st.sidebar.title("🚀 功能导航")
 app_mode = st.sidebar.radio("选择模式", ["📝 现场计分 (Data Entry)", "📊 总分计算与排名 (Analysis)"])
 
 # --- 核心算法函数 (保持不变) ---
@@ -51,7 +153,7 @@ if app_mode == "📝 现场计分 (Data Entry)":
         # 处理点击
         if score_val is not None:
             st.session_state.current_data.append(score_val)
-            st.success(f"已记录：{score_val} 分")
+            st.success(f"⚡ 已记录：{score_val} 分")
 
         # 显示当前序列
         st.write("当前得分序列：", st.session_state.current_data)
@@ -62,8 +164,11 @@ if app_mode == "📝 现场计分 (Data Entry)":
             total_shots = len(shots)
             inbound_rate = np.sum(shots > 0) / total_shots
             hq_rate = np.sum(shots == 4) / total_shots
-            st.metric("当前入界率", f"{inbound_rate:.1%}")
-            st.metric("高质量率 (4分)", f"{hq_rate:.1%}")
+            
+            # 使用 Metric 显示
+            m_col1, m_col2 = st.columns(2)
+            m_col1.metric("当前入界率", f"{inbound_rate:.1%}")
+            m_col2.metric("高质量率 (4分)", f"{hq_rate:.1%}")
 
     # --- 场景 B: 回合控制测试 (按回合录入) ---
     elif test_category == "底线回合控制测试":
@@ -90,11 +195,11 @@ if app_mode == "📝 现场计分 (Data Entry)":
                     "高质量": hq_count,
                     "连续": cons_hq
                 })
-                st.success("回合数据已添加")
+                st.success("✅ 回合数据已添加")
 
         # 显示已录入回合
         if len(st.session_state.current_data) > 0:
-            st.dataframe(pd.DataFrame(st.session_state.current_data))
+            st.dataframe(pd.DataFrame(st.session_state.current_data), use_container_width=True)
 
     # --- 数据控制区 ---
     st.markdown("---")
@@ -104,10 +209,8 @@ if app_mode == "📝 现场计分 (Data Entry)":
         st.experimental_rerun()
         
     # 导出为 Excel 格式供“总分计算”模块使用
-    # 注意：这里我们生成一个简化版的汇总数据，为了演示流程
     if len(st.session_state.current_data) > 0 and student_name:
-        st.caption("提示：在实际使用中，您可以将多次记录的数据下载后，合并到一个 Excel 文件中上传进行总分计算。")
-        # 这里仅做演示逻辑，生成一个临时 CSV
+        st.caption("提示：请下载 CSV 文件用于后续合并计算。")
         if test_category == "底线回合控制测试":
             df_export = pd.DataFrame(st.session_state.current_data)
             df_export['姓名'] = student_name
